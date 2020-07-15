@@ -7,14 +7,16 @@ This is a guide for formatting =Stata= output using emacs. The desired output is
 #+END_ABSTRACT 
 
 * Dependencies
-  | Program  | My Version                    | Free |
-  |----------+-------------------------------+------|
-  | Stata    | 15                            | No   |
-  | Emacs    | 28.0.50 GNU Emacs             | Yes  |
-  | Latex    | pdfTeX 3.14159265-2.6-1.40.21 | Yes  |
-  | Git      | 2.27.0                        | Yes  |
-  | Homebrew |                               | Yes  |
-  | latexmk  |                               | Yes  |
+  | Program    | My Version                    | Free |
+  |------------+-------------------------------+------|
+  | Stata      | 15                            | No   |
+  | Emacs      | 28.0.50 GNU Emacs             | Yes  |
+  | Latex      | pdfTeX 3.14159265-2.6-1.40.21 | Yes  |
+  | Git        | 2.27.0                        | Yes  |
+  | Homebrew   |                               | Yes  |
+  | latexmk    | 4.69a                         | Yes  |
+  | svn        | 1.14.0                        | Yes  |
+  | pygmentize |                           |      |
   
 
 This guide is specifically for =Stata .do= files---much of the information here will work for other languages that are supported by =org-babel= and =emacs-ESS=, but some of the export options may be different. You will need a working version of Stata with a license; I have Stata 15 and I assume that newer versions will be backwards-compatible, but I'm not sure about older versions. You will need a local copy of Stata; this approach will not work with a remote copy on a university's servers. 
@@ -43,4 +45,19 @@ If you already have =git= installed, you will get a message to that effect. You 
 brew install emacs
 #+end_example
 
+** Install =pygmentize=
+** Install =svn= (optional)
+If you want to download my =emacs= configuration, you'll need =svn=.
+
+#+begin_example
+brew install svn
+#+end_example
+
 * Configuring =Emacs=
+  I've built a minimal =emacs= configuration file that you can grab from github. You'll need to have =svn= installed to grab just the configuration subdirectory. First move to your home directory, then download the appropriate files.
+
+#+begin_example
+cd 
+svn checkout https://github.com/ChristopherAckerman/making_stata_logs/trunk/emacs/.emacs.d
+#+end_example
+Most of the configuration is standard, but I've included a few custom =lisp= snippets to patch official packages. Removing these will break =Stata= support, but you can add additional packages without any issues (my actual =Emacs= configuration is much longer).

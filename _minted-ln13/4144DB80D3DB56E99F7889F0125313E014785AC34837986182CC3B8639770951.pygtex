@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{reg} morekids multi2nd, r
+\PYG{k}{reg} weeksm1 multi2nd, r
+\PYG{k}{reg} workedm multi2nd, r
+\end{Verbatim}

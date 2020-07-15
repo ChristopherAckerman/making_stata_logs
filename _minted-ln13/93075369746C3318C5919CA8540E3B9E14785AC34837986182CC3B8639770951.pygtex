@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{reg} agefstm multi2nd agem1 boy1st boy2nd blackm hispm othracem, r
+\PYG{k}{reg} educm multi2nd agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\PYG{k}{reg} agefstm samesex agem1 boy1st boy2nd blackm hispm othracem, r
+\PYG{k}{reg} educm samesex agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{Verbatim}

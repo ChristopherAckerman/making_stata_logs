@@ -1,6 +1,6 @@
-% Created 2020-07-15 Wed 10:24
+% Created 2020-07-15 Wed 14:04
 % Intended LaTeX compiler: pdflatex
-\documentclass[11pt]{article}
+\documentclass[cache=false]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -15,6 +15,7 @@
 \usepackage{capt-of}
 \usepackage{hyperref}
 \usepackage{minted}
+\usepackage[margin=0.25in]{geometry}
 \date{\today}
 \title{}
 \hypersetup{
@@ -26,7 +27,7 @@
  pdflang={English}}
 \begin{document}
 
-\tableofcontents
+\centering
 
 14.32 Lecture 13
 Edited 04-16-20 from code for Extrapolating 2013

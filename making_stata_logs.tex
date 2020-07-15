@@ -1,4 +1,4 @@
-% Created 2020-07-14 Tue 23:58
+% Created 2020-07-15 Wed 13:04
 % Intended LaTeX compiler: pdflatex
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
@@ -34,7 +34,7 @@ This is a guide for formatting \texttt{Stata} output using emacs. The desired ou
 \end{ABSTRACT}
 
 \section{Dependencies}
-\label{sec:org452a58b}
+\label{sec:orgff04fd4}
 \begin{center}
 \begin{tabular}{lrl}
 Program & My Version & Free\\
@@ -44,19 +44,22 @@ Emacs & 28.0.50 GNU Emacs & Yes\\
 Latex & pdfTeX 3.14159265-2.6-1.40.21 & Yes\\
 Git & 2.27.0 & Yes\\
 Homebrew &  & Yes\\
+latexmk & 4.69a & Yes\\
+svn & 1.14.0 & Yes\\
 \end{tabular}
 \end{center}
+
 
 This guide is specifically for \texttt{Stata .do} files---much of the information here will work for other languages that are supported by \texttt{org-babel} and \texttt{emacs-ESS}, but some of the export options may be different. You will need a working version of Stata with a license; I have Stata 15 and I assume that newer versions will be backwards-compatible, but I'm not sure about older versions. You will need a local copy of Stata; this approach will not work with a remote copy on a university's servers. 
 
 You will also need a version of Emacs; I'm using the development version 28, but this should work for versions 24 or higher. You will also need a latex distribution to compile the final document. 
 
-\section{Setting up Emacs}
-\label{sec:org759a64c}
+\section{Installing Emacs}
+\label{sec:org3b61220}
 This guide assumes you have never used \texttt{Emacs}, but have working installs of both \texttt{latex} and \texttt{Stata}. We will also be using \texttt{Homebrew}; if you don't have \texttt{Homebrew} installed and want to learn more, please visit \url{https://brew.sh/} and follow the installation instructions. I will also include installation instructions in this guide, so you can just run the command I list. The next step is to open a terminal. It's okay if you haven't used the terminal before; I'll list all the commands you'll need to run---you can just copy and paste them into the terminal. To launch the \texttt{Terminal} app on Mac, use the system tray to navigate to \texttt{Apps > Utilites > Terminal} and open \texttt{Terminal}.
 
 \subsection{Install \texttt{Homebrew}}
-\label{sec:orgea0b082}
+\label{sec:orgdf12993}
 If you don't have \texttt{Homebrew} installed, copy the following command into your terminal and run it.
 
 
@@ -65,15 +68,33 @@ If you don't have \texttt{Homebrew} installed, copy the following command into y
 \end{verbatim}
 
 \subsection{Install \texttt{git}}
-\label{sec:org50ee339}
+\label{sec:org1e0491d}
    If you don't have \texttt{git} installed, run \texttt{brew install git} from your terminal.
 If you already have \texttt{git} installed, you will get a message to that effect. You can also check directly by running
 \texttt{which git} you get a filepath as output, that means that you already have \texttt{git} installed.
 
 \subsection{Install \texttt{Emacs}}
-\label{sec:org397b5e4}
+\label{sec:orgcced5b6}
 
 \begin{verbatim}
 brew install emacs
 \end{verbatim}
+
+\subsection{Install \texttt{svn} (optional)}
+\label{sec:orge5c27f4}
+If you want to download my \texttt{emacs} configuration, you'll need \texttt{svn}.
+
+\begin{verbatim}
+brew install svn
+\end{verbatim}
+
+\section{Configuring \texttt{Emacs}}
+\label{sec:org1a6f9b8}
+I've built a minimal \texttt{emacs} configuration file that you can grab from github. You'll need to have \texttt{svn} installed to grab just the configuration subdirectory. First move to your home directory, then download the appropriate files.
+
+\begin{verbatim}
+cd 
+svn checkout https://github.com/ChristopherAckerman/making_stata_logs/trunk/emacs/.emacs.d
+\end{verbatim}
+Most of the configuration is standard, but I've included a few custom \texttt{lisp} snippets to patch official packages. Removing these will break \texttt{Stata} support, but you can add additional packages without any issues (my actual \texttt{Emacs} configuration is much longer).
 \end{document}

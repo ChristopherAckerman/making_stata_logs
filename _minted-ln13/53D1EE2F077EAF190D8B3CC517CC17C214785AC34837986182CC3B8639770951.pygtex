@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{reg} morekids samesex, r
+\PYG{k}{reg} weeksm1 samesex, r
+\PYG{k}{reg} workedm samesex, r
+\end{Verbatim}

@@ -19,11 +19,11 @@
 ;;org-mode
 (require 'org)
 (require 'pdf-tools)
-(setq Tex-auto-save t)
-(setq Tex-parse-self t)
-(setq-default Tex-master nil)
-(setq TeX-PDF-mode t)
-(pdf-tools-install)
+;; (setq Tex-auto-save t)
+;; (setq Tex-parse-self t)
+;; (setq-default Tex-master nil)
+;; (setq TeX-PDF-mode t)
+;; (pdf-tools-install)
 
 ;; stats stuff
 (require 'ess)
@@ -43,11 +43,12 @@
 (require 's)
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((stata . t)))
+ '((stata . t)
+   (latex . t)))
 ;; Include the latex-exporter
 (require 'ox-latex)
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted) 
 
-(setq org-latex-to-pdf-process (list "latexmk -e '$pdflatex=q/pdflatex %O -shell-escape %S/' -pdf %f"))
+(setq org-latex-to-pdf-process (list "latexmk -shell-escape -f -interaction=nonstopmode -pdf %f"))
 

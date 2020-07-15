@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+ivregress 2sls weeksm1 (morekids = multi2nd samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = multi2nd samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{Verbatim}

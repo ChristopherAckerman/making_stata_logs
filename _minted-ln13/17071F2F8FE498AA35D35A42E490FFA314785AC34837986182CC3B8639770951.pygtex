@@ -1,0 +1,60 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{gen} ageq2nd1=\PYG{n+nf}{real}(ageq2nd)
+\PYG{k}{gen} ageq3rd1=\PYG{n+nf}{real}(ageq3rd)
+
+\PYG{k}{gen} multi2nd = (ageq2nd1 \PYG{o}{==} ageq3rd1)
+
+\PYG{k}{gen} educm = gradem \PYG{o}{\PYGZhy{}} \PYG{l+m}{3}
+\PYG{k}{replace} educm = gradem \PYG{o}{\PYGZhy{}} \PYG{l+m}{2}\PYG{k}{ if} fingradm \PYG{o}{==} \PYG{l+m}{2} | fingradm \PYG{o}{==} \PYG{l+m}{1}
+\PYG{k}{replace} educm = \PYG{n+nf}{max}(\PYG{l+m}{0},educm)
+
+\PYG{k}{gen} blackm= ( racem\PYG{o}{==}\PYG{l+m}{2})
+\PYG{k}{gen} hispm= ( racem\PYG{o}{==}\PYG{l+m}{12})
+\PYG{k}{gen} whitem= ( racem\PYG{o}{==}\PYG{l+m}{1})
+\PYG{k}{gen} othracem = \PYG{l+m}{1} \PYG{o}{\PYGZhy{}} blackm \PYG{o}{\PYGZhy{}} hispm \PYG{o}{\PYGZhy{}} whitem
+
+\PYG{k}{gen} boy1st = (sexk\PYG{o}{==}\PYG{l+m}{0})
+\PYG{k}{gen} boy2nd = (sex2nd\PYG{o}{==}\PYG{l+m}{0})
+\PYG{k}{gen} boys2 = (sexk\PYG{o}{==}\PYG{l+m}{0} \PYG{o}{\PYGZam{}} sex2nd\PYG{o}{==}\PYG{l+m}{0})
+\PYG{k}{gen} girls2 =(sexk\PYG{o}{==}\PYG{l+m}{1} \PYG{o}{\PYGZam{}} sex2nd\PYG{o}{==}\PYG{l+m}{1})
+\PYG{k}{gen} samesex =(boys2\PYG{o}{==}\PYG{l+m}{1} | girls2\PYG{o}{==}\PYG{l+m}{1})
+
+\PYG{k}{gen} morekids = \PYG{l+m}{1}\PYG{k}{ if} kidcount\PYG{o}{\PYGZgt{}}\PYG{l+m}{2}
+\PYG{k}{replace} morekids = \PYG{l+m}{0}\PYG{k}{ if} kidcount\PYG{o}{\PYGZlt{}=}\PYG{l+m}{2}
+
+\PYG{k}{gen} illegit=\PYG{l+m}{0}
+\PYG{k}{gen} yom = .
+\PYG{k}{replace} qtrmar = qtrmar \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}
+\PYG{k}{replace} yom = yobm \PYG{o}{+} agemar\PYG{k}{ if} (qtrbthm \PYG{o}{\PYGZlt{}=} qtrmar)
+\PYG{k}{replace} yom = yobm \PYG{o}{+} agemar \PYG{o}{+} \PYG{l+m}{1}\PYG{k}{ if} (qtrbthm\PYG{o}{\PYGZgt{}}qtrmar)
+\PYG{k}{gen} dom\PYGZus{}q = yom \PYG{o}{+} (qtrmar\PYG{o}{/}\PYG{l+m}{4})
+\PYG{k}{gen} dolb\PYGZus{}q = yobk \PYG{o}{+} ((qtrbkid)\PYG{o}{/}\PYG{l+m}{4})
+\PYG{k}{replace} illegit = \PYG{l+m}{1}\PYG{k}{ if} ((dom\PYGZus{}q \PYG{o}{\PYGZhy{}} dolb\PYGZus{}q)\PYG{o}{\PYGZgt{}}\PYG{l+m}{0}	)
+
+\PYG{k}{gen} yobd=\PYG{l+m}{79} \PYG{o}{\PYGZhy{}} aged
+\PYG{k}{replace} yobd = \PYG{l+m}{80} \PYG{o}{\PYGZhy{}} aged\PYG{k}{ if} qtrbthd\PYG{o}{==}\PYG{l+m}{0}
+
+\PYG{k}{gen} agem1 = agem\PYG{o}{*}\PYG{l+m}{1}
+\PYG{k}{gen} aged1 = aged\PYG{o}{*}\PYG{l+m}{1}
+\PYG{k}{gen} ageqm = \PYG{l+m}{4}\PYG{o}{*}(\PYG{l+m}{80} \PYG{o}{\PYGZhy{}} yobm)\PYG{o}{\PYGZhy{}}qtrbthm\PYG{l+m}{\PYGZhy{}1}
+\PYG{k}{gen} ageqd = \PYG{l+m}{4}\PYG{o}{*}(\PYG{l+m}{80} \PYG{o}{\PYGZhy{}} yobd) \PYG{o}{\PYGZhy{}} qtrbthd
+\PYG{k}{gen} agefstd = \PYG{n+nf}{int}((ageqd \PYG{o}{\PYGZhy{}} ageqk)\PYG{o}{/}\PYG{l+m}{4})
+\PYG{k}{gen} agefstm = \PYG{n+nf}{int}((ageqm \PYG{o}{\PYGZhy{}} ageqk)\PYG{o}{/}\PYG{l+m}{4})
+\PYG{k}{gen} msample = \PYG{l+m}{0}
+\PYG{k}{replace} msample = \PYG{l+m}{1}\PYG{k}{ if} ((aged\PYG{o}{!=}.) \PYG{o}{\PYGZam{}} (timesmar\PYG{o}{==}\PYG{l+m}{1}) \PYG{o}{\PYGZam{}} (marital\PYG{o}{==}\PYG{l+m}{0}) \PYG{o}{\PYGZam{}} (illegit\PYG{o}{==}\PYG{l+m}{0}) \PYG{o}{\PYGZam{}} (agefstd \PYG{o}{\PYGZgt{}=}\PYG{l+m}{15}) \PYG{o}{\PYGZam{}} (agefstm \PYG{o}{\PYGZgt{}=} \PYG{l+m}{15}) \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n+nf}{mi}(agefstd))
+
+\PYG{k}{gen} weeksm1 = weeksm\PYG{o}{*}\PYG{l+m}{1}
+\PYG{k}{gen} weeksd1 = weeksd\PYG{o}{*}\PYG{l+m}{1}
+\PYG{k}{gen} workedm = \PYG{l+m}{0}
+\PYG{k}{replace} workedm = \PYG{l+m}{1}\PYG{k}{ if} weeksm\PYG{o}{\PYGZgt{}}\PYG{l+m}{0}
+\PYG{k}{gen} workedd = \PYG{l+m}{0}
+\PYG{k}{replace} workedd = \PYG{l+m}{1}\PYG{k}{ if} weeksd\PYG{o}{\PYGZgt{}}\PYG{l+m}{0}
+\PYG{k}{gen} hourswd = hoursd\PYG{o}{*}\PYG{l+m}{1}
+\PYG{k}{gen} hourswm = hoursm\PYG{o}{*}\PYG{l+m}{1}
+
+\PYG{c+c1}{*All women sample:}
+\PYG{k}{keep if} ((agem1\PYG{o}{\PYGZgt{}=}\PYG{l+m}{21} \PYG{o}{\PYGZam{}} agem1\PYG{o}{\PYGZlt{}=}\PYG{l+m}{35}) \PYG{o}{\PYGZam{}} (kidcount\PYG{o}{\PYGZgt{}=}\PYG{l+m}{2}) \PYG{o}{\PYGZam{}} (ageq2nd1\PYG{o}{\PYGZgt{}}\PYG{l+m}{4}) \PYG{o}{\PYGZam{}} (agefstm\PYG{o}{\PYGZgt{}=}\PYG{l+m}{15}) \PYG{o}{\PYGZam{}} (asex\PYG{o}{==}\PYG{l+m}{0}) \PYG{o}{\PYGZam{}} (aage\PYG{o}{==}\PYG{l+m}{0}) \PYG{o}{\PYGZam{}} (aqtrbrth\PYG{o}{==}\PYG{l+m}{0}) \PYG{o}{\PYGZam{}} (asex2nd\PYG{o}{==}\PYG{l+m}{0}) \PYG{o}{\PYGZam{}} (aage2nd\PYG{o}{==}\PYG{l+m}{0}))
+  \PYG{c+cm}{/*\PYGZam{} (agefstd\PYGZgt{}=15 | agefstd==.)*/}
+
+\PYG{c+cm}{*keep if (msample==1)}
+\end{Verbatim}

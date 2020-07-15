@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{reg} morekids multi2nd samesex agem1 agefstm boy1st boy2nd blackm hispm othracem
+\PYG{k}{predict} more\PYGZus{}hat\PYG{k}{ if e}(sample)
+\PYG{k}{reg} weeksm1 more\PYGZus{}hat agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{Verbatim}
