@@ -1,0 +1,156 @@
+#+BIND: org-export-use-babel nil
+
+   14.32 Lecture 13
+   Edited 04-16-20 from code for Extrapolating 2013
+
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+clear
+set more off
+#+END_SRC
+
+Data from https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:1902.1/11288
+
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+import delimited m_d_806.tab
+#+END_SRC
+
+Recodes
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+gen ageq2nd1=real(ageq2nd)
+gen ageq3rd1=real(ageq3rd)
+
+gen multi2nd = (ageq2nd1 == ageq3rd1)
+
+gen educm = gradem - 3
+replace educm = gradem - 2 if fingradm == 2 | fingradm == 1
+replace educm = max(0,educm)
+
+gen blackm= ( racem==2)
+gen hispm= ( racem==12)
+gen whitem= ( racem==1)
+gen othracem = 1 - blackm - hispm - whitem
+
+gen boy1st = (sexk==0)
+gen boy2nd = (sex2nd==0)
+gen boys2 = (sexk==0 & sex2nd==0)
+gen girls2 =(sexk==1 & sex2nd==1)
+gen samesex =(boys2==1 | girls2==1)
+
+gen morekids = 1 if kidcount>2
+replace morekids = 0 if kidcount<=2
+
+gen illegit=0
+gen yom = .
+replace qtrmar = qtrmar - 1 
+replace yom = yobm + agemar if (qtrbthm <= qtrmar) 
+replace yom = yobm + agemar + 1 if (qtrbthm>qtrmar) 
+gen dom_q = yom + (qtrmar/4) 
+gen dolb_q = yobk + ((qtrbkid)/4) 
+replace illegit = 1 if ((dom_q - dolb_q)>0	) 
+
+gen yobd=79 - aged
+replace yobd = 80 - aged if qtrbthd==0
+
+gen agem1 = agem*1
+gen aged1 = aged*1
+gen ageqm = 4*(80 - yobm)-qtrbthm-1
+gen ageqd = 4*(80 - yobd) - qtrbthd
+gen agefstd = int((ageqd - ageqk)/4)
+gen agefstm = int((ageqm - ageqk)/4)
+gen msample = 0
+replace msample = 1 if ((aged!=.) & (timesmar==1) & (marital==0) & (illegit==0) & (agefstd >=15) & (agefstm >= 15) & !mi(agefstd))
+
+gen weeksm1 = weeksm*1
+gen weeksd1 = weeksd*1
+gen workedm = 0
+replace workedm = 1 if weeksm>0
+gen workedd = 0
+replace workedd = 1 if weeksd>0
+gen hourswd = hoursd*1
+gen hourswm = hoursm*1
+
+*All women sample:
+keep if ((agem1>=21 & agem1<=35) & (kidcount>=2) & (ageq2nd1>4) & (agefstm>=15) & (asex==0) & (aage==0) & (aqtrbrth==0) & (asex2nd==0) & (aage2nd==0))
+  /*& (agefstd>=15 | agefstd==.)*/
+  
+*keep if (msample==1)
+
+#+END_SRC
+
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+sum agem1 kidcount ageq2nd1 agefstm weeksm1 workedm morekids agem1 boy1st boy2nd blackm hispm othracem multi2nd samesex msample
+#+END_SRC
+
+OLS
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+reg weeksm1 morekids agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+reg workedm morekids agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+#+END_SRC
+
+First stage and reduced form: twins
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+reg morekids multi2nd, r
+reg weeksm1 multi2nd, r
+reg workedm multi2nd, r
+#+END_SRC
+
+Wald for twins
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+ivregress 2sls weeksm1 (morekids = multi2nd)
+#+END_SRC
+
+First stage and reduced form: samesex
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+reg morekids samesex, r
+reg weeksm1 samesex, r
+reg workedm samesex, r
+#+END_SRC
+
+Wald for samesex
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+ivregress 2sls weeksm1 (morekids = samesex)
+#+END_SRC
+
+Check for balance
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+reg agefstm multi2nd agem1 boy1st boy2nd blackm hispm othracem, r
+reg educm multi2nd agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+reg agefstm samesex agem1 boy1st boy2nd blackm hispm othracem, r
+reg educm samesex agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+#+END_SRC
+
+2SLS (twins, w/covs)
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+ivregress 2sls weeksm1 (morekids = multi2nd) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = multi2nd) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+#+END_SRC
+
+2SLS (samesex, w/covs)
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+ivregress 2sls weeksm1 (morekids = samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+#+END_SRC
+
+2SLS (overid, w/covs)
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+ivregress 2sls weeksm1 (morekids = multi2nd samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = multi2nd samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+#+END_SRC
+
+manual 2SLS
+#+BEGIN_SRC stata :session *stata* :exports both :results output
+reg morekids multi2nd samesex agem1 agefstm boy1st boy2nd blackm hispm othracem
+predict more_hat if e(sample)
+reg weeksm1 more_hat agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+#+END_SRC
+
+#+RESULTS:
+: set more off
+: reg morekids multi2nd samesex agem1 agefstm boy1st boy2nd blackm hispm othrac
+: em
+: no variables defined
+: r(111);
+: last estimates not found
+: r(301);
+: no variables defined
+: r(111);

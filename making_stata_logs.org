@@ -1,0 +1,46 @@
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [a4paper]
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+
+#+BEGIN_ABSTRACT
+This is a guide for formatting =Stata= output using emacs. The desired output is a PDF that clearly shows the commands run in =Stata=, along with the output from those commands. We'll be using =Emacs org-babel= to run code inside =.org= files. This makes it possible to re-run analyses, and also add nicely formatted prose to the same file. 
+#+END_ABSTRACT 
+
+* Dependencies
+  | Program  | My Version                    | Free |
+  |----------+-------------------------------+------|
+  | Stata    | 15                            | No   |
+  | Emacs    | 28.0.50 GNU Emacs             | Yes  |
+  | Latex    | pdfTeX 3.14159265-2.6-1.40.21 | Yes  |
+  | Git      | 2.27.0                        | Yes  |
+  | Homebrew |                               | Yes  |
+  | latexmk  |                               | Yes  |
+  
+
+This guide is specifically for =Stata .do= files---much of the information here will work for other languages that are supported by =org-babel= and =emacs-ESS=, but some of the export options may be different. You will need a working version of Stata with a license; I have Stata 15 and I assume that newer versions will be backwards-compatible, but I'm not sure about older versions. You will need a local copy of Stata; this approach will not work with a remote copy on a university's servers. 
+
+You will also need a version of Emacs; I'm using the development version 28, but this should work for versions 24 or higher. You will also need a latex distribution to compile the final document. 
+
+* Installing Emacs
+This guide assumes you have never used =Emacs=, but have working installs of both =latex= and =Stata=. We will also be using =Homebrew=; if you don't have =Homebrew= installed and want to learn more, please visit [[https://brew.sh/]] and follow the installation instructions. I will also include installation instructions in this guide, so you can just run the command I list. The next step is to open a terminal. It's okay if you haven't used the terminal before; I'll list all the commands you'll need to run---you can just copy and paste them into the terminal. To launch the =Terminal= app on Mac, use the system tray to navigate to =Apps > Utilites > Terminal= and open =Terminal=.
+
+** Install =Homebrew=
+If you don't have =Homebrew= installed, copy the following command into your terminal and run it.
+
+
+#+begin_example
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+#+end_example
+
+** Install =git=
+   If you don't have =git= installed, run ~brew install git~ from your terminal.
+If you already have =git= installed, you will get a message to that effect. You can also check directly by running
+~which git~ you get a filepath as output, that means that you already have =git= installed.
+
+** Install =Emacs=
+   
+#+begin_example
+brew install emacs
+#+end_example
+
+* Configuring =Emacs=

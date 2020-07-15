@@ -1,0 +1,63 @@
+(setq inhibit-startup-message t)
+(setq inhibit-scratch-message nil)
+
+;;PacMan stuff
+(require 'package)
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives
+	     '("gnu" . "http://elpa.gnu.org/packages/"))
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(setq package-check-signature nil)
+
+;; (eval-when-compile
+;;   (require 'use-package))
+
+;;org-mode
+(use-package 'org :ensure t)
+(use-package 'pdf-tools :ensure t)
+(setq Tex-auto-save t)
+(setq Tex-parse-self t)
+(setq-default Tex-master nil)
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(setq reftex-plug-into-AUCTeX t)
+(setq TeX-PDF-mode t)
+(pdf-tools-install)
+
+;; stats stuff
+(use-package 'ess :ensure t)
+(use-package 'ess-site :ensure t)
+;; personal elisp (and ob-stata.el/ess-stata-mode.el)
+(add-to-list 'load-path "~/dotfiles/emacs/.emacs.d/lisp")
+(require 'ess-stata-mode)
+;; (setq-default inferior-STA-program-name "stata-se")
+(setq-default inferior-STA-program "stata-se")
+(setq-default inferior-STA-start-args "")
+
+;;literate programming
+(require 'babel)
+(setq org-confirm-babel-evaluate nil)
+;; Tell emacs location of the directory containing 
+(require 'ob-stata)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((stata . t)))
+;; Include the latex-exporter
+(use-package 'ox-latex :ensure t)
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted) 
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(setq org-src-fontify-natively t)

@@ -1,0 +1,702 @@
+% Created 2020-07-15 Wed 10:24
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{minted}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 28.0.50 (Org mode 9.3)}, 
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
+14.32 Lecture 13
+Edited 04-16-20 from code for Extrapolating 2013
+
+\begin{minted}[]{stata}
+clear
+set more off
+\end{minted}
+
+Data from \url{https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:1902.1/11288}
+
+\begin{minted}[]{stata}
+import delimited m_d_806.tab
+\end{minted}
+
+\begin{verbatim}
+(85 vars, 927,267 obs)
+\end{verbatim}
+
+
+Recodes
+\begin{minted}[]{stata}
+gen ageq2nd1=real(ageq2nd)
+gen ageq3rd1=real(ageq3rd)
+
+gen multi2nd = (ageq2nd1 == ageq3rd1)
+
+gen educm = gradem - 3
+replace educm = gradem - 2 if fingradm == 2 | fingradm == 1
+replace educm = max(0,educm)
+
+gen blackm= ( racem==2)
+gen hispm= ( racem==12)
+gen whitem= ( racem==1)
+gen othracem = 1 - blackm - hispm - whitem
+
+gen boy1st = (sexk==0)
+gen boy2nd = (sex2nd==0)
+gen boys2 = (sexk==0 & sex2nd==0)
+gen girls2 =(sexk==1 & sex2nd==1)
+gen samesex =(boys2==1 | girls2==1)
+
+gen morekids = 1 if kidcount>2
+replace morekids = 0 if kidcount<=2
+
+gen illegit=0
+gen yom = .
+replace qtrmar = qtrmar - 1 
+replace yom = yobm + agemar if (qtrbthm <= qtrmar) 
+replace yom = yobm + agemar + 1 if (qtrbthm>qtrmar) 
+gen dom_q = yom + (qtrmar/4) 
+gen dolb_q = yobk + ((qtrbkid)/4) 
+replace illegit = 1 if ((dom_q - dolb_q)>0	) 
+
+gen yobd=79 - aged
+replace yobd = 80 - aged if qtrbthd==0
+
+gen agem1 = agem*1
+gen aged1 = aged*1
+gen ageqm = 4*(80 - yobm)-qtrbthm-1
+gen ageqd = 4*(80 - yobd) - qtrbthd
+gen agefstd = int((ageqd - ageqk)/4)
+gen agefstm = int((ageqm - ageqk)/4)
+gen msample = 0
+replace msample = 1 if ((aged!=.) & (timesmar==1) & (marital==0) & (illegit==0) & (agefstd >=15) & (agefstm >= 15) & !mi(agefstd))
+
+gen weeksm1 = weeksm*1
+gen weeksd1 = weeksd*1
+gen workedm = 0
+replace workedm = 1 if weeksm>0
+gen workedd = 0
+replace workedd = 1 if weeksd>0
+gen hourswd = hoursd*1
+gen hourswm = hoursm*1
+
+*All women sample:
+keep if ((agem1>=21 & agem1<=35) & (kidcount>=2) & (ageq2nd1>4) & (agefstm>=15) & (asex==0) & (aage==0) & (aqtrbrth==0) & (asex2nd==0) & (aage2nd==0))
+  /*& (agefstd>=15 | agefstd==.)*/
+
+*keep if (msample==1)
+
+\end{minted}
+
+\begin{verbatim}
+(272,098 missing values generated)
+(676,104 missing values generated)
+(803,347 real changes made)
+(2,458 real changes made)
+(676,104 missing values generated)
+(676,104 real changes made)
+(927,267 missing values generated)
+(927,267 real changes made)
+(340,508 real changes made)
+(586,759 real changes made)
+replace illegit = 1 if ((dom_q - dolb_q)>0)
+(108,294 real changes made)
+(164,424 missing values generated)
+(187,601 real changes made)
+(164,424 missing values generated)
+(164,424 missing values generated)
+(164,424 missing values generated)
+replace msample = 1 if ((aged!=.) & (timesmar==1) & (marital==0) & (illegit==
+0) & (agefstd >=15) & (agefstm >= 15) & !mi(agefstd))
+(596,315 real changes made)
+(164,424 missing values generated)
+(565,443 real changes made)
+(905,599 real changes made)
+(164,424 missing values generated)
+keep if ((agem1>=21 & agem1<=35) & (kidcount>=2) & (ageq2nd1>4) & (agefstm>=1
+5) & (asex==0) & (aage==0) & (aqtrbrth==0) & (asex2nd==0) & (aage2nd==0))
+(532,427 observations deleted)
+\end{verbatim}
+
+\begin{minted}[]{stata}
+sum agem1 kidcount ageq2nd1 agefstm weeksm1 workedm morekids agem1 boy1st boy2nd blackm hispm othracem multi2nd samesex msample
+\end{minted}
+
+\begin{verbatim}
+sum agem1 kidcount ageq2nd1 agefstm weeksm1 workedm morekids agem1 boy1st boy
+2nd blackm hispm othracem multi2nd samesex msample
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+       agem1 |    394,840     30.1248    3.509685         21         35
+    kidcount |    394,840    2.552069    .8083876          2         12
+    ageq2nd1 |    394,840    26.36489    14.61527          5         70
+     agefstm |    394,840    20.13956    2.949069         15         33
+     weeksm1 |    394,840    20.83419    22.28601          0         52
+-------------+---------------------------------------------------------
+     workedm |    394,840    .5654873    .4956935          0          1
+    morekids |    394,840    .4020641    .4903154          0          1
+       agem1 |    394,840     30.1248    3.509685         21         35
+      boy1st |    394,840     .511088    .4998777          0          1
+      boy2nd |    394,840    .5109614    .4998805          0          1
+-------------+---------------------------------------------------------
+      blackm |    394,840    .1189343    .3237115          0          1
+       hispm |    394,840      .03004    .1706976          0          1
+    othracem |    394,840     .028685      .16692          0          1
+    multi2nd |    394,840    .0085604    .0921258          0          1
+     samesex |    394,840    .5053895    .4999716          0          1
+-------------+---------------------------------------------------------
+     msample |    394,840    .6449499    .4785291          0          1
+\end{verbatim}
+
+OLS
+\begin{minted}[]{stata}
+reg weeksm1 morekids agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+reg workedm morekids agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{minted}
+
+\begin{verbatim}
+
+Linear regression                               Number of obs     =    394,840
+                                                F(8, 394831)      =    4589.07
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0778
+                                                Root MSE          =     21.402
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -8.978191   .0705666  -127.23   0.000      -9.1165   -8.839883
+       agem1 |   1.466036   .0105266   139.27   0.000     1.445404    1.486668
+     agefstm |  -1.423913   .0131709  -108.11   0.000    -1.449728   -1.398099
+      boy1st |  -.1153498   .0681462    -1.69   0.091    -.2489143    .0182147
+      boy2nd |  -.1773649   .0681483    -2.60   0.009    -.3109335   -.0437963
+      blackm |   6.451669   .1103587    58.46   0.000     6.235369    6.667968
+       hispm |  -.7810209   .1956389    -3.99   0.000    -1.164467   -.3975744
+    othracem |   2.860371   .2109436    13.56   0.000     2.446928    3.273814
+       _cons |   8.280615   .3199806    25.88   0.000     7.653463    8.907767
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(8, 394831)      =    3032.83
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0537
+                                                Root MSE          =     .48222
+
+------------------------------------------------------------------------------
+             |               Robust
+     workedm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -.1764489   .0016171  -109.11   0.000    -.1796184   -.1732793
+       agem1 |   .0241995   .0002424    99.84   0.000     .0237244    .0246745
+     agefstm |  -.0291002   .0002967   -98.07   0.000    -.0296818   -.0285187
+      boy1st |  -.0005312   .0015353    -0.35   0.729    -.0035404     .002478
+      boy2nd |  -.0040863   .0015353    -2.66   0.008    -.0070955   -.0010771
+      blackm |   .1060263   .0023474    45.17   0.000     .1014255     .110627
+       hispm |  -.0309759   .0046057    -6.73   0.000    -.0400029   -.0219488
+    othracem |   .0420805   .0046453     9.06   0.000     .0329759    .0511852
+       _cons |   .4829654   .0075603    63.88   0.000     .4681474    .4977834
+------------------------------------------------------------------------------
+\end{verbatim}
+
+First stage and reduced form: twins
+\begin{minted}[]{stata}
+reg morekids multi2nd, r
+reg weeksm1 multi2nd, r
+reg workedm multi2nd, r
+\end{minted}
+
+\begin{verbatim}
+
+Linear regression                               Number of obs     =    394,840
+                                                F(0, 394838)      =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.0128
+                                                Root MSE          =     .48716
+
+------------------------------------------------------------------------------
+             |               Robust
+    morekids |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    multi2nd |   .6030987    .000782   771.25   0.000      .601566    .6046313
+       _cons |   .3969013    .000782   507.56   0.000     .3953687     .398434
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(1, 394838)      =      27.19
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0001
+                                                Root MSE          =     22.285
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    multi2nd |  -1.975956   .3789719    -5.21   0.000    -2.718729   -1.233182
+       _cons |    20.8511   .0356232   585.32   0.000     20.78128    20.92092
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(1, 394838)      =      28.12
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0001
+                                                Root MSE          =     .49568
+
+------------------------------------------------------------------------------
+             |               Robust
+     workedm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    multi2nd |  -.0457607   .0086298    -5.30   0.000    -.0626747   -.0288466
+       _cons |    .565879   .0007922   714.33   0.000     .5643264    .5674317
+------------------------------------------------------------------------------
+\end{verbatim}
+
+Wald for twins
+\begin{minted}[]{stata}
+ivregress 2sls weeksm1 (morekids = multi2nd)
+\end{minted}
+
+\begin{verbatim}
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(1)    =      26.71
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0138
+                                                  Root MSE        =     22.132
+
+------------------------------------------------------------------------------
+     weeksm1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -3.276339   .6339241    -5.17   0.000    -4.518807   -2.033871
+       _cons |   22.15149   .2573002    86.09   0.000     21.64719    22.65579
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   multi2nd
+\end{verbatim}
+
+First stage and reduced form: samesex
+\begin{minted}[]{stata}
+reg morekids samesex, r
+reg weeksm1 samesex, r
+reg workedm samesex, r
+\end{minted}
+
+\begin{verbatim}
+
+Linear regression                               Number of obs     =    394,840
+                                                F(1, 394838)      =    1461.73
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0037
+                                                Root MSE          =     .48941
+
+------------------------------------------------------------------------------
+             |               Robust
+    morekids |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     samesex |    .059544   .0015574    38.23   0.000     .0564915    .0625965
+       _cons |   .3719712   .0010937   340.10   0.000     .3698276    .3741148
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(1, 394838)      =      28.50
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0001
+                                                Root MSE          =     22.285
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     samesex |  -.3786749   .0709378    -5.34   0.000    -.5177109   -.2396389
+       _cons |   21.02557   .0505151   416.22   0.000     20.92656    21.12457
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(1, 394838)      =      24.76
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0001
+                                                Root MSE          =     .49568
+
+------------------------------------------------------------------------------
+             |               Robust
+     workedm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     samesex |  -.0078507   .0015777    -4.98   0.000    -.0109431   -.0047584
+       _cons |    .569455   .0011205   508.23   0.000     .5672589     .571651
+------------------------------------------------------------------------------
+\end{verbatim}
+
+Wald for samesex
+\begin{minted}[]{stata}
+ivregress 2sls weeksm1 (morekids = samesex)
+\end{minted}
+
+\begin{verbatim}
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(1)    =      29.00
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0173
+                                                  Root MSE        =     22.093
+
+------------------------------------------------------------------------------
+     weeksm1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -6.359578   1.181014    -5.38   0.000    -8.674324   -4.044833
+       _cons |   23.39115   .4761434    49.13   0.000     22.45792    24.32437
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   samesex
+\end{verbatim}
+
+Check for balance
+\begin{minted}[]{stata}
+reg agefstm multi2nd agem1 boy1st boy2nd blackm hispm othracem, r
+reg educm multi2nd agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+reg agefstm samesex agem1 boy1st boy2nd blackm hispm othracem, r
+reg educm samesex agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{minted}
+
+\begin{verbatim}
+
+Linear regression                               Number of obs     =    394,840
+                                                F(7, 394832)      =   16568.12
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.1941
+                                                Root MSE          =     2.6475
+
+------------------------------------------------------------------------------
+             |               Robust
+     agefstm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    multi2nd |   .1752039   .0457188     3.83   0.000     .0855964    .2648115
+       agem1 |   .3290559   .0010836   303.66   0.000      .326932    .3311798
+      boy1st |   .0094222   .0084286     1.12   0.264    -.0070976     .025942
+      boy2nd |   .0193927   .0084301     2.30   0.021       .00287    .0359155
+      blackm |  -1.427554   .0120888  -118.09   0.000    -1.451248    -1.40386
+       hispm |  -.5792559   .0234584   -24.69   0.000    -.6252337   -.5332781
+    othracem |   .6226536   .0280525    22.20   0.000     .5676715    .6776357
+       _cons |   10.37992   .0320333   324.04   0.000     10.31713     10.4427
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(8, 394831)      =    9264.86
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.2109
+                                                Root MSE          =     2.1325
+
+------------------------------------------------------------------------------
+             |               Robust
+       educm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    multi2nd |  -.0074761   .0373593    -0.20   0.841    -.0806992    .0657471
+       agem1 |   .0221166   .0010089    21.92   0.000     .0201392     .024094
+     agefstm |   .3330336   .0014574   228.51   0.000     .3301771    .3358902
+      boy1st |   .0036823   .0067884     0.54   0.588    -.0096229    .0169874
+      boy2nd |   .0075476   .0067899     1.11   0.266    -.0057603    .0208555
+      blackm |   .2191673   .0101611    21.57   0.000     .1992517    .2390828
+       hispm |  -2.374502   .0326049   -72.83   0.000    -2.438406   -2.310597
+    othracem |   -.531052   .0321654   -16.51   0.000    -.5940952   -.4680088
+       _cons |    4.80712   .0341787   140.65   0.000     4.740131    4.874109
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(7, 394832)      =   16567.41
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.1941
+                                                Root MSE          =     2.6475
+
+------------------------------------------------------------------------------
+             |               Robust
+     agefstm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     samesex |   .0217124   .0084313     2.58   0.010     .0051874    .0382375
+       agem1 |   .3290979   .0010836   303.71   0.000     .3269741    .3312217
+      boy1st |   .0089868   .0084313     1.07   0.286    -.0075383     .025512
+      boy2nd |   .0188476   .0084318     2.24   0.025     .0023216    .0353737
+      blackm |  -1.427105    .012089  -118.05   0.000    -1.450799   -1.403411
+       hispm |  -.5793764   .0234604   -24.70   0.000     -.625358   -.5333947
+    othracem |   .6225523   .0280511    22.19   0.000      .567573    .6775316
+       _cons |   10.36963   .0323018   321.02   0.000     10.30632    10.43294
+------------------------------------------------------------------------------
+
+Linear regression                               Number of obs     =    394,840
+                                                F(8, 394831)      =    9264.95
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.2109
+                                                Root MSE          =     2.1325
+
+------------------------------------------------------------------------------
+             |               Robust
+       educm |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     samesex |  -.0087736   .0067908    -1.29   0.196    -.0220833    .0045362
+       agem1 |   .0221105   .0010089    21.92   0.000     .0201332    .0240878
+     agefstm |   .3330388   .0014574   228.51   0.000     .3301823    .3358953
+      boy1st |   .0038694   .0067906     0.57   0.569    -.0094399    .0171787
+      boy2nd |   .0077413   .0067907     1.14   0.254    -.0055683    .0210509
+      blackm |   .2191597   .0101598    21.57   0.000     .1992469    .2390726
+       hispm |  -2.374498   .0326047   -72.83   0.000    -2.438402   -2.310594
+    othracem |  -.5310898   .0321659   -16.51   0.000     -.594134   -.4680457
+       _cons |   4.811376   .0343194   140.19   0.000     4.744112    4.878641
+------------------------------------------------------------------------------
+\end{verbatim}
+
+2SLS (twins, w/covs)
+\begin{minted}[]{stata}
+ivregress 2sls weeksm1 (morekids = multi2nd) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = multi2nd) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{minted}
+
+\begin{verbatim}
+ivregress 2sls weeksm1 (morekids = multi2nd) agem1 agefstm boy1st boy2nd blac
+km hispm othracem, r
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(8)    =   18168.92
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0654
+                                                  Root MSE        =     21.545
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -3.712292   .6036268    -6.15   0.000    -4.895379   -2.529205
+       agem1 |   1.307164   .0209401    62.42   0.000     1.266122    1.348205
+     agefstm |  -1.186511   .0300822   -39.44   0.000    -1.245471   -1.127551
+      boy1st |  -.0804947   .0687157    -1.17   0.241    -.2151751    .0541857
+      boy2nd |  -.1385996   .0687455    -2.02   0.044    -.2733383   -.0038609
+      blackm |   6.075055   .1192318    50.95   0.000     5.841365    6.308745
+       hispm |  -1.603621   .2187741    -7.33   0.000    -2.032411   -1.174832
+    othracem |   2.482386    .216284    11.48   0.000     2.058477    2.906295
+       _cons |   6.210914    .398797    15.57   0.000     5.429286    6.992542
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   agem1 agefstm boy1st boy2nd blackm hispm othracem multi2nd
+ivregress 2sls workedm (morekids = multi2nd) agem1 agefstm boy1st boy2nd blac
+km hispm othracem, r
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(8)    =   10971.93
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0455
+                                                  Root MSE        =     .48428
+
+------------------------------------------------------------------------------
+             |               Robust
+     workedm |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -.0812696   .0139393    -5.83   0.000    -.1085901   -.0539491
+       agem1 |   .0213279   .0004839    44.08   0.000     .0203795    .0222763
+     agefstm |  -.0248092    .000692   -35.85   0.000    -.0261656   -.0234529
+      boy1st |   .0000988   .0015446     0.06   0.949    -.0029285    .0031262
+      boy2nd |  -.0033856   .0015453    -2.19   0.028    -.0064144   -.0003568
+      blackm |   .0992191   .0025567    38.81   0.000     .0942081    .1042302
+       hispm |  -.0458441   .0051133    -8.97   0.000     -.055866   -.0358221
+    othracem |   .0352486   .0047645     7.40   0.000     .0259103    .0445869
+       _cons |   .4455563    .009336    47.72   0.000     .4272581    .4638545
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   agem1 agefstm boy1st boy2nd blackm hispm othracem multi2nd
+\end{verbatim}
+
+2SLS (samesex, w/covs)
+\begin{minted}[]{stata}
+ivregress 2sls weeksm1 (morekids = samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{minted}
+
+\begin{verbatim}
+ivregress 2sls weeksm1 (morekids = samesex) agem1 agefstm boy1st boy2nd black
+m hispm othracem, r
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(8)    =   18252.28
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0726
+                                                  Root MSE        =     21.462
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |   -5.55877   1.117829    -4.97   0.000    -7.749673   -3.367866
+       agem1 |   1.362872   .0352894    38.62   0.000     1.293706    1.432038
+     agefstm |  -1.269755   .0520245   -24.41   0.000    -1.371722   -1.167789
+      boy1st |  -.0927166   .0687273    -1.35   0.177    -.2274196    .0419864
+      boy2nd |  -.1521926   .0688292    -2.21   0.027    -.2870953   -.0172899
+      blackm |   6.207114   .1364545    45.49   0.000     5.939668     6.47456
+       hispm |  -1.315178   .2625227    -5.01   0.000    -1.829713   -.8006428
+    othracem |   2.614926   .2260306    11.57   0.000     2.171914    3.057938
+       _cons |   6.936651   .5431087    12.77   0.000     5.872177    8.001124
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   agem1 agefstm boy1st boy2nd blackm hispm othracem samesex
+ivregress 2sls workedm (morekids = samesex) agem1 agefstm boy1st boy2nd black
+m hispm othracem, r
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(8)    =   10996.53
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0505
+                                                  Root MSE        =     .48301
+
+------------------------------------------------------------------------------
+             |               Robust
+     workedm |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |   -.117295   .0251545    -4.66   0.000     -.166597    -.067993
+       agem1 |   .0224148   .0007955    28.18   0.000     .0208556    .0239739
+     agefstm |  -.0264334     .00117   -22.59   0.000    -.0287266   -.0241401
+      boy1st |  -.0001396   .0015469    -0.09   0.928    -.0031714    .0028922
+      boy2nd |  -.0036508    .001549    -2.36   0.018    -.0066868   -.0006149
+      blackm |   .1017956   .0029574    34.42   0.000     .0959992     .107592
+       hispm |  -.0402164    .006057    -6.64   0.000     -.052088   -.0283449
+    othracem |   .0378345   .0049857     7.59   0.000     .0280627    .0476063
+       _cons |   .4597156   .0124318    36.98   0.000     .4353497    .4840816
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   agem1 agefstm boy1st boy2nd blackm hispm othracem samesex
+\end{verbatim}
+
+2SLS (overid, w/covs)
+\begin{minted}[]{stata}
+ivregress 2sls weeksm1 (morekids = multi2nd samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+ivregress 2sls workedm (morekids = multi2nd samesex) agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{minted}
+
+\begin{verbatim}
+ivregress 2sls weeksm1 (morekids = multi2nd samesex) agem1 agefstm boy1st boy
+2nd blackm hispm othracem, r
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(8)    =   18224.63
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0674
+                                                  Root MSE        =     21.522
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -4.141475   .5311981    -7.80   0.000    -5.182605   -3.100346
+       agem1 |   1.320112   .0190752    69.21   0.000     1.282725    1.357499
+     agefstm |   -1.20586   .0271733   -44.38   0.000    -1.259118   -1.152601
+      boy1st |  -.0833355   .0686168    -1.21   0.225    -.2178218    .0511509
+      boy2nd |  -.1417591   .0686413    -2.07   0.039    -.2762936   -.0072245
+      blackm |    6.10575   .1173185    52.04   0.000      5.87581     6.33569
+       hispm |  -1.536577   .2138234    -7.19   0.000    -1.955663   -1.117491
+    othracem |   2.513193   .2151399    11.68   0.000     2.091526    2.934859
+       _cons |   6.379599   .3822657    16.69   0.000     5.630372    7.128826
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   agem1 agefstm boy1st boy2nd blackm hispm othracem multi2nd
+               samesex
+ivregress 2sls workedm (morekids = multi2nd samesex) agem1 agefstm boy1st boy
+2nd blackm hispm othracem, r
+
+Instrumental variables (2SLS) regression          Number of obs   =    394,840
+                                                  Wald chi2(8)    =   11005.77
+                                                  Prob > chi2     =     0.0000
+                                                  R-squared       =     0.0469
+                                                  Root MSE        =     .48394
+
+------------------------------------------------------------------------------
+             |               Robust
+     workedm |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    morekids |  -.0896431   .0121839    -7.36   0.000    -.1135231   -.0657631
+       agem1 |   .0215805   .0004385    49.22   0.000     .0207211    .0224399
+     agefstm |  -.0251867   .0006208   -40.57   0.000    -.0264035   -.0239699
+      boy1st |   .0000434   .0015429     0.03   0.978    -.0029806    .0030673
+      boy2nd |  -.0034473   .0015434    -2.23   0.026    -.0064723   -.0004222
+      blackm |    .099818   .0025086    39.79   0.000     .0949012    .1047348
+       hispm |   -.044536   .0049987    -8.91   0.000    -.0543333   -.0347388
+    othracem |   .0358496   .0047367     7.57   0.000     .0265659    .0451334
+       _cons |   .4488474   .0089436    50.19   0.000     .4313183    .4663765
+------------------------------------------------------------------------------
+Instrumented:  morekids
+Instruments:   agem1 agefstm boy1st boy2nd blackm hispm othracem multi2nd
+               samesex
+\end{verbatim}
+
+manual 2SLS
+\begin{minted}[]{stata}
+reg morekids multi2nd samesex agem1 agefstm boy1st boy2nd blackm hispm othracem
+predict more_hat if e(sample)
+reg weeksm1 more_hat agem1 agefstm boy1st boy2nd blackm hispm othracem, r
+\end{minted}
+
+\begin{verbatim}
+reg morekids multi2nd samesex agem1 agefstm boy1st boy2nd blackm hispm othrac
+em
+
+      Source |       SS           df       MS      Number of obs   =   394,840
+-------------+----------------------------------   F(9, 394830)    =   4708.57
+       Model |  9200.59068         9  1022.28785   Prob > F        =    0.0000
+    Residual |  85722.3271   394,830   .21711199   R-squared       =    0.0969
+-------------+----------------------------------   Adj R-squared   =    0.0969
+       Total |  94922.9177   394,839  .240409174   Root MSE        =    .46595
+
+------------------------------------------------------------------------------
+    morekids |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    multi2nd |   .6049071   .0080499    75.14   0.000     .5891295    .6206847
+     samesex |   .0614735   .0014839    41.43   0.000     .0585652    .0643819
+       agem1 |   .0301281   .0002318   129.97   0.000     .0296738    .0305825
+     agefstm |  -.0452589   .0002801  -161.58   0.000    -.0458079   -.0447099
+      boy1st |  -.0080449   .0014839    -5.42   0.000    -.0109533   -.0051366
+      boy2nd |  -.0084413   .0014839    -5.69   0.000    -.0113497   -.0055329
+      blackm |   .0696438   .0023467    29.68   0.000     .0650443    .0742433
+       hispm |   .1565985    .004367    35.86   0.000     .1480392    .1651578
+    othracem |   .0729161   .0044574    16.36   0.000     .0641797    .0816525
+       _cons |   .3630539   .0072301    50.21   0.000     .3488831    .3772248
+------------------------------------------------------------------------------
+(option xb assumed; fitted values)
+
+Linear regression                               Number of obs     =    394,840
+                                                F(8, 394831)      =    2227.06
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0420
+                                                Root MSE          =     21.813
+
+------------------------------------------------------------------------------
+             |               Robust
+     weeksm1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    more_hat |  -4.141476   .5336062    -7.76   0.000    -5.187328   -3.095624
+       agem1 |   1.320112   .0192077    68.73   0.000     1.282466    1.357759
+     agefstm |   -1.20586   .0273376   -44.11   0.000     -1.25944   -1.152279
+      boy1st |  -.0833355   .0695413    -1.20   0.231    -.2196343    .0529634
+      boy2nd |  -.1417591   .0695644    -2.04   0.042    -.2781032   -.0054149
+      blackm |    6.10575    .118865    51.37   0.000     5.872778    6.338722
+       hispm |  -1.536577   .2171298    -7.08   0.000    -1.962145   -1.111009
+    othracem |   2.513193   .2175725    11.55   0.000     2.086757    2.939628
+       _cons |   6.379599   .3862117    16.52   0.000     5.622636    7.136563
+------------------------------------------------------------------------------
+\end{verbatim}
+\end{document}

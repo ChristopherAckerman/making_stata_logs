@@ -1,0 +1,3 @@
+reg morekids multi2nd samesex agem1 agefstm boy1st boy2nd blackm hispm othracem
+predict more_hat if e(sample)
+reg weeksm1 more_hat agem1 agefstm boy1st boy2nd blackm hispm othracem, r

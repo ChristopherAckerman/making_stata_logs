@@ -1,0 +1,72 @@
+% Created 2020-07-14 Tue 22:22
+% Intended LaTeX compiler: pdflatex
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage[margin=0.5in]{geometry}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 28.0.50 (Org mode 9.3)}, 
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
+\begin{ABSTRACT}
+This is a guide for formatting \texttt{Stata} output using emacs. The desired output is a PDF that clearly shows the commands run in \texttt{Stata}, along with the output from those commands. We'll be using \texttt{Emacs org-babel} to run code inside \texttt{.org} files. This makes it possible to re-run analyses, and also add nicely formatted prose to the same file. 
+\end{ABSTRACT}
+
+\section{Dependencies}
+\label{sec:org7c02b83}
+\begin{center}
+\begin{tabular}{lrl}
+Program & My Version & Free\\
+\hline
+Stata & 15 & No\\
+Emacs & 28.0.50 GNU Emacs & Yes\\
+Latex & pdfTeX 3.14159265-2.6-1.40.21 & Yes\\
+Git & 2.27.0 & Yes\\
+Homebrew &  & Yes\\
+\end{tabular}
+\end{center}
+
+This guide is specifically for \texttt{Stata .do} files---much of the information here will work for other languages that are supported by \texttt{org-babel} and \texttt{emacs-ESS}, but some of the export options may be different. You will need a working version of Stata with a license; I have Stata 15 and I assume that newer versions will be backwards-compatible, but I'm not sure about older versions. You will need a local copy of Stata; this approach will not work with a remote copy on a university's servers. 
+
+You will also need a version of Emacs; I'm using the development version 28, but this should work for versions 24 or higher. You will also need a latex distribution to compile the final document. 
+
+\section{Setting up Emacs}
+\label{sec:orgecd49cf}
+This guide assumes you have never used \texttt{Emacs}, but have working installs of both \texttt{latex} and \texttt{Stata}. We will also be using \texttt{Homebrew}; if you don't have \texttt{Homebrew} installed and want to learn more, please visit \url{https://brew.sh/} and follow the installation instructions. I will also include installation instructions in this guide, so you can just run the command I list. The next step is to open a terminal. It's okay if you haven't used the terminal before; I'll list all the commands you'll need to run---you can just copy and paste them into the terminal. To launch the \texttt{Terminal} app on Mac, use the system tray to navigate to \texttt{Apps > Utilites > Terminal} and open \texttt{Terminal}.
+
+\subsection{Install \texttt{Homebrew}}
+\label{sec:org1f8f9f2}
+If you don't have \texttt{Homebrew} installed, copy the following command into your terminal and run it.
+
+
+\begin{verbatim}
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+\end{verbatim}
+
+\subsection{Install \texttt{git}}
+\label{sec:org0516766}
+   If you don't have \texttt{git} installed, copy \texttt{brew install git} into your terminal and run it.
+If you already have \texttt{git} installed, you will get a message to that effect. You can also check directly by running
+\texttt{which git} you get a filepath as output, that means that you already have \texttt{git} installed.
+\end{document}
